@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Central de Calculadoras Técnicas</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-hover: #263348;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --success: #10b981;
+      --danger: #ef4444;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      min-height: 100vh;
+      padding-bottom: 36px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .header-inner {
+      max-width: 680px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .brand span {
+      font-size: 0.76rem;
+      color: var(--muted);
+      display: block;
+    }
+
+    .btn-gear {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .btn-gear:active {
+      opacity: 0.8;
+    }
+
+    .container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Busca rápida */
+    .search-box {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .search-box input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 12px 14px 12px 38px;
+      border-radius: var(--radius);
+      font-size: 15px;
+      outline: none;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    /* Grid de Ferramentas */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 540px) {
+      .tools-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .tool-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.12s ease, border-color 0.15s ease, background 0.15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .tool-card:hover {
+      background: var(--surface-hover);
+      border-color: var(--card-color, var(--accent));
+    }
+
+    .tool-card:active {
+      transform: scale(0.985);
+    }
+
+    .tool-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--card-color, var(--accent));
+    }
+
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .tool-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      flex-shrink: 0;
+    }
+
+    .tool-arrow {
+      color: var(--muted);
+      font-size: 1.1rem;
+      font-weight: bold;
+      padding-top: 4px;
+    }
+
+    .tool-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .tool-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .tool-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: var(--bg);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    /* Painel de Configuração (Modal) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 40;
+      padding: 12px;
+    }
+
+    @media (min-width: 540px) {
+      .modal-backdrop {
+        align-items: center;
+      }
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 540px;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 18px;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h2 {
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .btn-close {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+      padding: 2px 6px;
+    }
+
+    .edit-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+
+    .edit-item-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .btn-del {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid var(--danger);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .field-group {
+      margin-bottom: 8px;
+    }
+
+    .field-group:last-child {
+      margin-bottom: 0;
+    }
+
+    .field-group label {
+      display: block;
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+
+    .field-group input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 7px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .btn-action {
+      border: none;
+      border-radius: 9px;
+      padding: 11px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0f172a;
+    }
+
+    .btn-secondary {
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-add-new {
+      width: 100%;
+      background: rgba(16, 185, 129, 0.15);
+      color: #6ee7b7;
+      border: 1px dashed var(--success);
+      border-radius: 9px;
+      padding: 10px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 4px;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 32px 16px;
+      font-size: 0.9rem;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text);
+      color: var(--bg);
+      padding: 10px 18px;
+      border-radius: 99px;
+      font-size: 0.84rem;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+      z-index: 60;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon">🧰</div>
+        <div>
+          <h1>Central de Calculadoras</h1>
+          <span>Ferramentas de Campo, Oficina &amp; Frota</span>
+        </div>
+      </div>
+      <button type="button" class="btn-gear" onclick="openSettings()">⚙️ Links</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search-input" placeholder="Buscar calculadora (ex: tinta, cabo, polegada, asfalto)..." oninput="renderCards()" />
+    </div>
+
+    <div id="tools-grid" class="tools-grid"></div>
+    <div id="empty-state" class="empty-state" style="display: none;">
+      Nenhuma calculadora encontrada para essa busca.
+    </div>
+  </div>
+
+  <!-- Modal para Editar Links ou Adicionar Novas Calculadoras -->
+  <div id="settings-modal" class="modal-backdrop" onclick="closeOnBackdrop(event)">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Gerenciar Links &amp; Ferramentas</h2>
+        <button type="button" class="btn-close" onclick="closeSettings()">✕</button>
+      </div>
+
+      <div id="edit-list"></div>
+
+      <button type="button" class="btn-add-new" onclick="addNewToolRow()">+ Adicionar Nova Calculadora</button>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-action btn-secondary" onclick="resetDefaults()">Restaurar Padrão</button>
+        <button type="button" class="btn-action btn-primary" onclick="saveSettings()">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Links atualizados!</div>
+
+  <script>
+    const STORAGE_KEY = 'hub_calc_tools_v1';
+
+    const DEFAULT_TOOLS = [
+      {
+        id: 'sinal',
+        icon: '🛣️',
+        title: 'CalcSinal',
+        desc: 'Cálculo de metragem (FP, FR, FS, FC, PA), tinta, microesferas, solvente e embalagens.',
+        tags: ['Sinalização Viária', 'm²', 'Tinta & Esferas'],
+        color: '#10b981',
+        url: 'https://dimblack20-tech.github.io/calcsinal/'
+      },
+      {
+        id: 'eletrica',
+        icon: '⚡',
+        title: 'CalcElétrica',
+        desc: 'Dimensionamento de cabos e disjuntores, autonomia de baterias/nobreak e consumo kWh.',
+        tags: ['Cabos & Queda', 'Bateria 12V/24V', 'W • V • A'],
+        color: '#f59e0b',
+        url: 'https://dimblack20-tech.github.io/calceletrica/'
+      },
+      {
+        id: 'medidas',
+        icon: '📐',
+        title: 'CalcMedidas',
+        desc: 'Conversor de polegadas fracionárias e mm, pressão (PSI/Bar), volume e diluição.',
+        tags: ['Polegadas & mm', 'PSI / Bar', 'Diluição 1:X'],
+        color: '#38bdf8',
+        url: 'https://dimblack20-tech.github.io/calcmedidas/'
+      },
+      {
+        id: 'obra',
+        icon: '🚧',
+        title: 'CalcObra & Frota',
+        desc: 'Concreto e massa asfáltica (CBUQ), volume de valas/caçambas, custo de rota e Flex.',
+        tags: ['Concreto & CBUQ', 'Valas & Solo', 'Combustível'],
+        color: '#f97316',
+        url: 'https://dimblack20-tech.github.io/calcobra/'
+      }
+    ];
+
+    function loadTools() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {}
+      return JSON.parse(JSON.stringify(DEFAULT_TOOLS));
+    }
+
+    let tools = loadTools();
+
+    function renderCards() {
+      const grid = document.getElementById('tools-grid');
+      const empty = document.getElementById('empty-state');
+      const query = (document.getElementById('search-input').value || '').toLowerCase().trim();
+
+      const filtered = tools.filter(t => {
+        if (!query) return true;
+        const hay = `${t.title} ${t.desc} ${(t.tags || []).join(' ')}`.toLowerCase();
+        return hay.includes(query);
+      });
+
+      grid.innerHTML = '';
+
+      if (filtered.length === 0) {
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      filtered.forEach(tool => {
+        const a = document.createElement('a');
+        a.className = 'tool-card';
+        a.href = tool.url || '#';
+        a.style.setProperty('--card-color', tool.color || '#38bdf8');
+
+        const tagsHtml = (tool.tags || [])
+          .filter(Boolean)
+          .map(tag => `<span class="tag">${escapeHtml(tag)}</span>`)
+          .join('');
+
+        a.innerHTML = `
+          <div>
+            <div class="card-top">
+              <div class="tool-icon">${escapeHtml(tool.icon || '🧮')}</div>
+              <span class="tool-arrow">↗</span>
+            </div>
+            <div class="tool-title">${escapeHtml(tool.title)}</div>
+            <div class="tool-desc">${escapeHtml(tool.desc)}</div>
+          </div>
+          <div class="tool-tags">${tagsHtml}</div>
+        `;
+        grid.appendChild(a);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // ==================== CONFIGURAÇÕES ====================
+    let draftTools = [];
+
+    function openSettings() {
+      draftTools = JSON.parse(JSON.stringify(tools));
+      renderEditList();
+      document.getElementById('settings-modal').classList.add('open');
+    }
+
+    function closeSettings() {
+      document.getElementById('settings-modal').classList.remove('open');
+    }
+
+    function closeOnBackdrop(e) {
+      if (e.target.id === 'settings-modal') closeSettings();
+    }
+
+    function renderEditList() {
+      const container = document.getElementById('edit-list');
+      container.innerHTML = '';
+
+      draftTools.forEach((t, idx) => {
+        const div = document.createElement('div');
+        div.className = 'edit-item';
+        div.innerHTML = `
+          <div class="edit-item-head">
+            <span>${escapeHtml(t.icon || '🧮')} ${escapeHtml(t.title || 'Nova Calculadora')}</span>
+            <button type="button" class="btn-del" onclick="removeToolRow(${idx})">Remover</button>
+          </div>
+          <div class="field-group">
+            <label>Nome</label>
+            <input type="text" value="${escapeHtml(t.title)}" oninput="draftTools[${idx}].title = this.value" />
+          </div>
+          <div class="field-group">
+            <label>Descrição curta</label>
+            <input type="text" value="${escapeHtml(t.desc)}" oninput="draftTools[${idx}].desc = this.value" />
+          </div>
+          <div class="field-group">
+            <label>Link (URL completa)</label>
+            <input type="url" value="${escapeHtml(t.url)}" oninput="draftTools[${idx}].url = this.value" />
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function addNewToolRow() {
+      draftTools.push({
+        id: 'custom_' + Date.now(),
+        icon: '🧮',
+        title: 'Nova Calculadora',
+        desc: 'Descrição da ferramenta',
+        tags: ['Personalizada'],
+        color: '#a855f7',
+        url: 'https://dimblack20-tech.github.io/'
+      });
+      renderEditList();
+    }
+
+    function removeToolRow(idx) {
+      draftTools.splice(idx, 1);
+      renderEditList();
+    }
+
+    function saveSettings() {
+      tools = draftTools.filter(t => t.title && t.url);
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tools));
+      } catch (e) {}
+      renderCards();
+      closeSettings();
+      showToast('Links salvos com sucesso!');
+    }
+
+    function resetDefaults() {
+      draftTools = JSON.parse(JSON.stringify(DEFAULT_TOOLS));
+      renderEditList();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    // Inicializa
+    renderCards();
+  </script>
+</body>
+</html>
